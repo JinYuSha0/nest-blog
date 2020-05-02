@@ -6,12 +6,16 @@ import {
 } from '@nestjs/platform-fastify'
 import { join } from 'path'
 import { ConfigService } from '@nestjs/config'
+import { HttpExceptionFilter } from '@filters/httpException.filter'
+import { TransformInterceptor } from '@interceptors/transform.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   )
+  app.useGlobalFilters(new HttpExceptionFilter())
+  app.useGlobalInterceptors(new TransformInterceptor())
   app.setViewEngine({
     engine: {
       pug: require('pug'),

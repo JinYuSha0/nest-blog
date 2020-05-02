@@ -12,8 +12,7 @@ import { Response } from 'express'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/user.dto'
 import { ValidationPipe } from '@pipes/validation.pipe'
-import { IpAccessLimitInterceptor } from '@interceptor/ipAccessLimit.interceptor'
-import EmailService from '@modules/email/email.service'
+import { IpAccessLimitInterceptor } from '@interceptors/ipAccessLimit.interceptor'
 
 @Controller('user')
 @UseInterceptors(IpAccessLimitInterceptor({ count: 30, duration: 300 }))
@@ -30,6 +29,6 @@ export class UserController {
 
   @Get('test')
   async test() {
-    return 'test'
+    return { a: 1 }
   }
 }

@@ -4,15 +4,15 @@ import { UserModule } from '@modules/user/user.module'
 import { ConfigModule } from '@nestjs/config'
 import CacheModule from '@modules/cache/cache.module'
 import DBModule from '@modules/db/db.module'
-import appConfiguration from '@config/app.config'
-import mongodbConfiguration from '@config/mongodb.config'
-import redisConfiguration from '@config/redis.config'
-import emailConfiguration from '@config/email.config'
+import appConfiguration from '@configs/app.config'
+import mongodbConfiguration from '@configs/mongodb.config'
+import redisConfiguration from '@configs/redis.config'
+import emailConfiguration from '@configs/email.config'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development', '.env.production'],
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       ignoreEnvFile: false,
       isGlobal: true,
       load: [

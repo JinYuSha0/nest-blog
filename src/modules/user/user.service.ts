@@ -1,4 +1,3 @@
-import * as crypto from 'crypto'
 import { ConfigService } from '@nestjs/config'
 import EmailService from '@modules/email/email.service'
 import { Injectable } from '@nestjs/common'
@@ -7,6 +6,18 @@ import { Model } from 'mongoose'
 import { User } from './interfaces/user.interface'
 import { CreateUserDto } from './dto/user.dto'
 import { ValidEmailDto } from './dto/validEmail.dto'
+import * as Utils from '@utils/common'
+import * as querystring from 'querystring'
+
+function genValidSign(
+  secureKey: string,
+  user: string,
+  email: string,
+  timestamp: number,
+): string {
+  return Utils.md5(timestamp + Utils.md5(user + Utils.md5(secureKey + email)))
+}
+
 @Injectable()
 export class UserService {
   constructor(
@@ -16,11 +27,26 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    // crypto.createHash('md5').update()
+    const timestamp = Utils.getCurrTimestampWithPadding(24 * 60 * 60 * 1000)
+    const sign = genValidSign(
+      this.configService.get('app.secureKey'),
+      createUserDto.user,
+      createUserDto.password,
+      timestamp,
+    )
+    const query = {
+      user: createUserDto.user,
+      email: createUserDto.reserveEmail,
+      timestamp,
+      sign,
+    }
     const sendEmailInfo = await this.emailService.sendRegisterEmail(
-      createUserDto.email,
+      createUserDto.reserveEmail,
       {
-        url: this.configService.get('app.host'),
+        url:
+          this.configService.get('app.host') +
+          'validRegisterEmail?' +
+          querystring.stringify(query),
         title: '验证邮箱',
         subject: `亲爱的${createUserDto.user}`,
         desc: '恭喜你注册成功',
@@ -32,7 +58,7 @@ export class UserService {
     return createUser.save()
   }
 
-  async validEmail(validEmailDto: ValidEmailDto): Promise<Boolean> {
+  async valid(validEmailDto: ValidEmailDto): Promise<Boolean> {
     return true
   }
 }

@@ -10,5 +10,5 @@ export class CreateUserDto {
   password: string
 
   @IsEmail()
-  email: string
+  reserveEmail: string
 }

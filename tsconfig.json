@@ -12,9 +12,10 @@
     "paths": {
       "@utils/*": ["src/utils/*"],
       "@pipes/*": ["src/pipes/*"],
-      "@config/*": ["src/config/*"],
+      "@configs/*": ["src/configs/*"],
       "@modules/*": ["src/modules/*"],
-      "@interceptor/*": ["src/interceptor/*"]
+      "@filters/*": ["src/filters/*"],
+      "@interceptors/*": ["src/interceptors/*"]
     },
     "incremental": true
   },
