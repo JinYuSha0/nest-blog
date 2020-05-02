@@ -1,4 +1,6 @@
-export function getReallyIp(req: any): string {
+import Request from 'request'
+
+export function getReallyIp(req: Request): string {
   try {
     let ip =
       req.headers['x-forwarded-for'] ||
@@ -13,6 +15,6 @@ export function getReallyIp(req: any): string {
   }
 }
 
-export function getControllerName(req: any): string {
-  return req.path.match(/\/(.*?)\//)[1]
+export function getControllerName(req: Request): string {
+  return req.raw.url.match(/\/(.*?)\//)[1]
 }

@@ -1,11 +1,11 @@
-import { Module, Global } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import CacheModule from '@modules/cache/cache.module'
+import EmailService from '@modules/email/email.service'
 import { UserSchema } from './schemas/user.schema'
 import { UserController } from './user.controller'
 import { UserService } from './user.service'
 
-@Global()
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -17,6 +17,6 @@ import { UserService } from './user.service'
     CacheModule,
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, EmailService],
 })
 export class UserModule {}

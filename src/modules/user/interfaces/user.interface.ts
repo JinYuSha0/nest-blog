@@ -6,4 +6,5 @@ export interface User extends Document {
   email: string
   level?: number
   vip?: number
+  emailValid?: Boolean
 }
