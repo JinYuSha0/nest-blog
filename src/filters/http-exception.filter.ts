@@ -4,8 +4,9 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common'
+import { ErrorMessage } from '@constants/error.enum'
+import BussinessException from '@exceptions/bussiness.exception'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,22 +16,29 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest()
 
     let message = exception.message
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR
+    let status = HttpStatus.INTERNAL_SERVER_ERROR
+    if (exception instanceof HttpException) {
+      status = exception.getStatus()
+    }
+    let code: number = status
+    if (exception instanceof BussinessException) {
+      code = exception.code
+    }
+
     // 非开发环境不展示错误详细内容
     if (status === 500 && process.env.NODE_ENV !== 'development') {
-      message = '系统内部错误'
+      message = ErrorMessage.INTERNAL_EXCEPTION
     }
+
     const errorResponse = {
       data: {
         message,
       },
-      code: status,
+      code,
       success: false,
       url: request.raw.url,
     }
+
     response.status(status)
     response.header('Content-Type', 'application/json; charset=utf-8')
     response.send(errorResponse)

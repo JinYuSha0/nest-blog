@@ -12,7 +12,9 @@ import { Response } from 'express'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/user.dto'
 import { ValidationPipe } from '@pipes/validation.pipe'
-import { IpAccessLimitInterceptor } from '@interceptors/ipAccessLimit.interceptor'
+import { IpAccessLimitInterceptor } from '@interceptors/ip-access-limit.interceptor'
+import BussinessException from '@exceptions/bussiness.exception'
+import { ErrorCode, ErrorMessage } from '@constants/error.enum'
 
 @Controller('user')
 @UseInterceptors(IpAccessLimitInterceptor({ count: 30, duration: 300 }))
@@ -29,6 +31,6 @@ export class UserController {
 
   @Get('test')
   async test() {
-    return { a: 1 }
+    throw new BussinessException(ErrorMessage.TIMEOUT, ErrorCode.TIMEOUT)
   }
 }

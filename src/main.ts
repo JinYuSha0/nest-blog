@@ -6,7 +6,7 @@ import {
 } from '@nestjs/platform-fastify'
 import { join } from 'path'
 import { ConfigService } from '@nestjs/config'
-import { HttpExceptionFilter } from '@filters/httpException.filter'
+import { HttpExceptionFilter } from '@filters/http-exception.filter'
 import { TransformInterceptor } from '@interceptors/transform.interceptor'
 
 async function bootstrap() {

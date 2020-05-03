@@ -15,6 +15,8 @@
       "@configs/*": ["src/configs/*"],
       "@modules/*": ["src/modules/*"],
       "@filters/*": ["src/filters/*"],
+      "@constants/*": ["src/constants/*"],
+      "@exceptions/*": ["src/exceptions/*"],
       "@interceptors/*": ["src/interceptors/*"]
     },
     "incremental": true
