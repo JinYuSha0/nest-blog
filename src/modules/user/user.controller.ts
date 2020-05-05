@@ -5,16 +5,15 @@ import {
   UseInterceptors,
   Inject,
   CACHE_MANAGER,
-  Res,
-  Render,
+  Post,
+  Body,
 } from '@nestjs/common'
-import { Response } from 'express'
 import { UserService } from './user.service'
-import { CreateUserDto } from './dto/user.dto'
+import { RegisterDto } from './dto/register.dto'
+import { ValidEmailDto } from './dto/valid-email.dto'
 import { ValidationPipe } from '@pipes/validation.pipe'
 import { IpAccessLimitInterceptor } from '@interceptors/ip-access-limit.interceptor'
-import BussinessException from '@exceptions/bussiness.exception'
-import { ErrorCode, ErrorMessage } from '@constants/error.enum'
+import { LoginDto } from './dto/login.dto'
 
 @Controller('user')
 @UseInterceptors(IpAccessLimitInterceptor({ count: 30, duration: 300 }))
@@ -24,13 +23,18 @@ export class UserController {
     @Inject(CACHE_MANAGER) private readonly cacheManager,
   ) {}
 
-  @Get('register')
-  create(@Query(new ValidationPipe()) body: CreateUserDto): any {
-    return this.userService.create(body)
+  @Post('register')
+  register(@Body(new ValidationPipe()) body: RegisterDto): any {
+    return this.userService.register(body)
   }
 
-  @Get('test')
-  async test() {
-    throw new BussinessException(ErrorMessage.TIMEOUT, ErrorCode.TIMEOUT)
+  @Get('valid')
+  valid(@Query(new ValidationPipe()) query: ValidEmailDto): any {
+    return this.userService.valid(query)
+  }
+
+  @Get('login')
+  login(@Query(new ValidationPipe()) body: LoginDto): any {
+    return this.userService.login(body)
   }
 }

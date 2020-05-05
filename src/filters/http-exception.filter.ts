@@ -30,13 +30,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = ErrorMessage.INTERNAL_EXCEPTION
     }
 
-    const errorResponse = {
+    const errorResponse: any = {
       data: {
         message,
       },
       code,
       success: false,
-      url: request.raw.url,
+    }
+
+    if (!(exception instanceof BussinessException)) {
+      errorResponse.url = request.raw.url
     }
 
     response.status(status)

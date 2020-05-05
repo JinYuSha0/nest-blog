@@ -1,17 +1,18 @@
 import { Length, IsString, IsNumberString, IsEmail } from 'class-validator'
 
 export class ValidEmailDto {
-  @Length(4)
+  @Length(4, 20)
   @IsString()
-  user: string
+  readonly user: string
 
   @IsEmail()
-  email: string
+  @Length(4, 320)
+  readonly email: string
 
   @Length(13)
   @IsNumberString()
-  timestamp: string
+  readonly timestamp: number
 
   @IsString()
-  sign: string
+  readonly sign: string
 }

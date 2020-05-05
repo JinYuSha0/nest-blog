@@ -41,7 +41,9 @@ export default class Email {
 
   sendEmail = async ({ to, subject, text, html }: SendEmailInfo) => {
     const info = await this.transporter.sendMail({
-      from: `"${this.config.get('app.name')}" <1009943858@qq.com>`,
+      from: `"${this.config.get('app.name')}" <${this.config.get(
+        'email.user',
+      )}>`,
       to,
       subject,
       text,
