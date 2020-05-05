@@ -11,27 +11,14 @@ import * as querystring from 'querystring'
 import BussinessException from '@exceptions/bussiness.exception'
 import { ErrorMessage, ErrorCode } from '@constants/error.enum'
 import { LoginDto } from './dto/login.dto'
-
-function genValidSign(
-  secureKey: string,
-  user: string,
-  email: string,
-  timestamp: number,
-): string {
-  return Utils.md5(timestamp + Utils.md5(user + Utils.md5(secureKey + email)))
-}
-
-function encryptPassword(secureKey: string, password: string) {
-  return Utils.md5(
-    secureKey + Utils.md5(secureKey + Utils.md5(secureKey + password)),
-  )
-}
+import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly jwtService: JwtService,
     @InjectModel('User') private readonly userModel: Model<User>,
   ) {}
 
@@ -61,8 +48,7 @@ export class UserService {
     }
 
     const timestamp = Utils.getCurrTimestampWithPadding(24 * 60 * 60 * 1000)
-    const sign = genValidSign(
-      this.configService.get('app.secureKey'),
+    const sign = this.genValidSign(
       registerDto.user,
       registerDto.email,
       timestamp,
@@ -86,10 +72,7 @@ export class UserService {
     })
     new this.userModel({
       ...registerDto,
-      password: encryptPassword(
-        this.configService.get('app.secureKey'),
-        registerDto.password,
-      ),
+      password: this.encryptPassword(registerDto.password),
     }).save()
     return {
       user: registerDto.user,
@@ -114,8 +97,7 @@ export class UserService {
       )
     }
 
-    const sign = genValidSign(
-      this.configService.get('app.secureKey'),
+    const sign = this.genValidSign(
       validEmailDto.user,
       validEmailDto.email,
       validEmailDto.timestamp,
@@ -156,35 +138,61 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<any> {
-    let loginRes = null
+    let entity: User
 
     if (loginDto.user) {
-      loginRes = await this.userModel.findOne({
+      entity = await this.userModel.findOne({
         user: loginDto.user,
-        password: encryptPassword(
-          this.configService.get('app.secureKey'),
-          loginDto.password,
-        ),
+        password: this.encryptPassword(loginDto.password),
       })
     }
 
-    if (loginDto.email && !loginRes) {
-      loginRes = await this.userModel.findOne({
+    if (loginDto.email && !entity) {
+      entity = await this.userModel.findOne({
         email: loginDto.email,
-        password: encryptPassword(
-          this.configService.get('app.secureKey'),
-          loginDto.password,
-        ),
+        password: this.encryptPassword(loginDto.password),
       })
     }
 
-    if (!loginRes) {
+    if (!entity) {
       throw new BussinessException(
         ErrorMessage.LOGIN_FAILURE,
         ErrorCode.LOGIN_FAILURE,
       )
     }
 
-    return loginRes
+    const payload = {
+      user: entity.user,
+      role: entity.role,
+    }
+
+    const token = this.signToken(payload)
+
+    return {
+      ...payload,
+      token,
+    }
+  }
+
+  encryptPassword(
+    password: string,
+    secureKey: string = this.configService.get('app.secureKey'),
+  ) {
+    return Utils.md5(
+      secureKey + Utils.md5(secureKey + Utils.md5(secureKey + password)),
+    )
+  }
+
+  genValidSign(
+    user: string,
+    email: string,
+    timestamp: number,
+    secureKey: string = this.configService.get('app.secureKey'),
+  ): string {
+    return Utils.md5(timestamp + Utils.md5(user + Utils.md5(secureKey + email)))
+  }
+
+  signToken(payload: any) {
+    return this.jwtService.sign(payload)
   }
 }

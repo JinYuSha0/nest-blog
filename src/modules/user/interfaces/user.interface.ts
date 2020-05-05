@@ -7,4 +7,5 @@ export interface User extends Document {
   valid?: Boolean
   level?: number
   vip?: number
+  role?: string
 }

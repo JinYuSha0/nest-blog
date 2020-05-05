@@ -5,6 +5,8 @@ import EmailService from '@modules/email/email.service'
 import { UserSchema } from './schemas/user.schema'
 import { UserController } from './user.controller'
 import { UserService } from './user.service'
+import { JwtModule } from '@nestjs/jwt'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 
 @Module({
   imports: [
@@ -14,6 +16,14 @@ import { UserService } from './user.service'
         schema: UserSchema,
       },
     ]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('app.secureKey'),
+        signOptions: { expiresIn: '12h' },
+      }),
+      inject: [ConfigService],
+    }),
     CacheModule,
   ],
   controllers: [UserController],
