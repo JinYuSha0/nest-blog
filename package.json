@@ -38,7 +38,7 @@
     "mongoose": "^5.9.10",
     "nodemailer": "^6.4.6",
     "point-of-view": "^3.8.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.5"
